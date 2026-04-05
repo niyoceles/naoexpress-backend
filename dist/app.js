@@ -15,6 +15,8 @@ const customerRoutes_1 = __importDefault(require("./routes/customerRoutes"));
 const courierRoutes_1 = __importDefault(require("./routes/courierRoutes"));
 const warehouseOpsRoutes_1 = __importDefault(require("./routes/warehouseOpsRoutes"));
 const supportRoutes_1 = __importDefault(require("./routes/supportRoutes"));
+const complaintRoutes_1 = __importDefault(require("./routes/complaintRoutes"));
+const inventoryRoutes_1 = __importDefault(require("./routes/inventoryRoutes"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 // Middleware
@@ -23,7 +25,7 @@ app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 // Health check
 app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'OK', message: 'RelayXpress Backend is running' });
+    res.status(200).json({ status: 'OK', message: 'NAO Express Backend is running' });
 });
 // Routes
 app.use('/api/auth', authRoutes_1.default);
@@ -35,6 +37,8 @@ app.use('/api/customer', customerRoutes_1.default);
 app.use('/api/courier', courierRoutes_1.default);
 app.use('/api/warehouse-ops', warehouseOpsRoutes_1.default);
 app.use('/api/support', supportRoutes_1.default);
+app.use('/api/complaints', complaintRoutes_1.default);
+app.use('/api/inventory', inventoryRoutes_1.default);
 // Centralized Error Handler
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;

@@ -44,6 +44,7 @@ var ShipmentStatus;
     ShipmentStatus["PICKUP_SCHEDULED"] = "pickup_scheduled";
     ShipmentStatus["PICKED_UP"] = "picked_up";
     ShipmentStatus["AT_ORIGIN_HUB"] = "at_origin_hub";
+    ShipmentStatus["DISPATCHED"] = "dispatched";
     ShipmentStatus["IN_TRANSIT"] = "in_transit";
     ShipmentStatus["CUSTOMS_PROCESSING"] = "customS_processing";
     ShipmentStatus["AT_DESTINATION_HUB"] = "at_destination_hub";
@@ -96,7 +97,12 @@ const ShipmentSchema = new mongoose_1.Schema({
         image: { type: String },
         signature: { type: String },
         timestamp: { type: Date }
-    }
+    },
+    assignedTo: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User' },
+    items: [{
+            skuId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'InventoryItem' },
+            quantity: { type: Number, required: true }
+        }]
 }, {
     timestamps: true
 });

@@ -5,8 +5,9 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
-    "seed": "ts-node src/utils/seed.ts"
+    "start": "npm run seed:prod && node dist/index.js",
+    "seed": "ts-node src/utils/seed.ts",
+    "seed:prod": "node dist/utils/seed.js"
   },
   "keywords": [],
   "author": "",

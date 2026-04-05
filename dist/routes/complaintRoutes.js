@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const complaintController_1 = require("../controllers/complaintController");
+const auth_1 = require("../middlewares/auth");
+const User_1 = require("../models/User");
+const router = (0, express_1.Router)();
+router.use(auth_1.protect);
+router.post('/', complaintController_1.createComplaint);
+router.get('/my', complaintController_1.getMyComplaints);
+router.get('/all', (0, auth_1.authorize)(User_1.UserRole.ADMIN, User_1.UserRole.SUPPORT), complaintController_1.getAllComplaints);
+router.patch('/:id/status', (0, auth_1.authorize)(User_1.UserRole.ADMIN, User_1.UserRole.SUPPORT), complaintController_1.updateComplaintStatus);
+router.post('/:id/respond', complaintController_1.respondToComplaint);
+exports.default = router;

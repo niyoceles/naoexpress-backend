@@ -9,12 +9,20 @@ import InventoryItem from '../models/InventoryItem';
 
 dotenv.config();
 
-const seedData = async () => {
+export const seedDatabase = async (isForce = false) => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/naoexpress');
-        console.log('Connected to MongoDB for seeding...');
+        // If not forced, check if users already exist
+        if (!isForce) {
+            const userCount = await User.countDocuments();
+            if (userCount > 0) {
+                console.log('Database already has data. Skipping automatic seed.');
+                return;
+            }
+        }
 
-        // Clear existing data
+        console.log('Starting database seeding...');
+
+        // Clear existing data only if forced or if DB was already empty (safety)
         await User.deleteMany({});
         await Organization.deleteMany({});
         await Shipment.deleteMany({});
@@ -197,12 +205,27 @@ const seedData = async () => {
         // Update sample shipment with assignment
         await Shipment.findByIdAndUpdate(shipment._id, { assignedTo: warehouseOp._id });
         console.log('Sample shipment assigned to warehouse operator.');
-        console.log('Seed data successfully fully populated!');
-        process.exit(0);
+        console.log('Seed data successfully populated!');
     } catch (error) {
         console.error('Error seeding data:', error);
-        process.exit(1);
     }
 };
 
-seedData();
+// Run if called directly
+if (require.main === module) {
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/naoexpress';
+    mongoose.connect(mongoUri)
+        .then(() => {
+            console.log('Connected to MongoDB for seeding...');
+            return seedDatabase(true); // Force seeding when run via CLI
+        })
+        .then(() => {
+            console.log('Seeding CLI finished.');
+            process.exit(0);
+        })
+        .catch(err => {
+            console.error('Seeding CLI error:', err);
+            process.exit(1);
+        });
+}
+

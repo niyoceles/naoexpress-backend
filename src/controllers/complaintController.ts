@@ -3,14 +3,26 @@ import Complaint, { ComplaintStatus } from '../models/Complaint';
 
 export const createComplaint = async (req: any, res: Response) => {
     try {
-        const { subject, description, shipmentId, priority } = req.body;
-        const complaint = await Complaint.create({
+        const { subject, description, shipmentId, priority, guestEmail, guestPhone } = req.body;
+        
+        const complaintData: any = {
             subject,
             description,
             shipmentId: shipmentId || null,
-            priority: priority || 'medium',
-            userId: req.user._id
-        });
+            priority: priority || 'medium'
+        };
+
+        if (req.user) {
+            complaintData.userId = req.user._id;
+        } else {
+            if (!guestEmail) {
+                return res.status(400).json({ success: false, message: 'Email is required for guest complaints.' });
+            }
+            complaintData.guestEmail = guestEmail;
+            complaintData.guestPhone = guestPhone;
+        }
+
+        const complaint = await Complaint.create(complaintData);
 
         res.status(201).json({ success: true, data: complaint });
     } catch (error: any) {

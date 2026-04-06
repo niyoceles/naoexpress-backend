@@ -19,7 +19,9 @@ export interface IComplaint extends Document {
     description: string;
     status: ComplaintStatus;
     priority: ComplaintPriority;
-    userId: mongoose.Types.ObjectId;
+    userId?: mongoose.Types.ObjectId;
+    guestEmail?: string;
+    guestPhone?: string;
     shipmentId?: mongoose.Types.ObjectId;
     assignedTo?: mongoose.Types.ObjectId;
     responses: Array<{
@@ -34,7 +36,9 @@ const ComplaintSchema: Schema = new Schema({
     description: { type: String, required: true },
     status: { type: String, enum: Object.values(ComplaintStatus), default: ComplaintStatus.OPEN },
     priority: { type: String, enum: Object.values(ComplaintPriority), default: ComplaintPriority.MEDIUM },
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
+    guestEmail: { type: String },
+    guestPhone: { type: String },
     shipmentId: { type: Schema.Types.ObjectId, ref: 'Shipment' },
     assignedTo: { type: Schema.Types.ObjectId, ref: 'User' },
     responses: [{

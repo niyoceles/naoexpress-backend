@@ -14,19 +14,19 @@ import { UserRole } from '../models/User';
 
 const router = express.Router();
 
-// All admin routes require Auth + Admin role
-router.use(protect, authorize(UserRole.ADMIN));
+// Middleware setup: Use protect globally, but authorize roles specifically
+router.use(protect);
 
-router.get('/analytics/overview', getAnalyticsOverview);
-router.get('/shipments', getAllShipments);
+router.get('/analytics/overview', authorize(UserRole.ADMIN), getAnalyticsOverview);
+router.get('/shipments', authorize(UserRole.ADMIN, UserRole.WAREHOUSE_OP), getAllShipments);
 
 // User CRUD
-router.get('/users',          getAllUsers);
-router.post('/users',         createUser);
-router.get('/users/:id',      getUserById);
-router.put('/users/:id',      updateUser);
-router.patch('/users/:id/toggle-status', toggleUserStatus);
-router.delete('/users/:id',   deleteUser);
+router.get('/users',          authorize(UserRole.ADMIN, UserRole.WAREHOUSE_OP), getAllUsers);
+router.post('/users',         authorize(UserRole.ADMIN), createUser);
+router.get('/users/:id',      authorize(UserRole.ADMIN), getUserById);
+router.put('/users/:id',      authorize(UserRole.ADMIN), updateUser);
+router.patch('/users/:id/toggle-status', authorize(UserRole.ADMIN), toggleUserStatus);
+router.delete('/users/:id',   authorize(UserRole.ADMIN), deleteUser);
 
 export default router;
 

@@ -16,9 +16,9 @@ const InventoryItemSchema: Schema = new Schema({
     name: { type: String, required: true },
     description: { type: String },
     quantity: { type: Number, required: true, default: 0 },
-    warehouseId: { type: Schema.Types.ObjectId, ref: 'Warehouse', required: true },
+    warehouseId: { type: Schema.Types.ObjectId, ref: 'Warehouse' },
     zone: { type: String, default: 'A' },
-    binLocation: { type: String, required: true },
+    binLocation: { type: String },
     status: { 
         type: String, 
         enum: ['in_stock', 'reserved', 'low_stock', 'out_of_stock'], 

@@ -38,6 +38,7 @@ export interface IShipment extends Document {
         country: string;
     };
     parcels: Array<{
+        name: string;
         weight: number;
         dimensions: { length: number; width: number; height: number };
         description?: string;
@@ -85,6 +86,7 @@ const ShipmentSchema: Schema = new Schema({
         country: { type: String, required: true }
     },
     parcels: [{
+        name: { type: String, required: true },
         weight: { type: Number, required: true },
         dimensions: {
             length: { type: Number, required: true },

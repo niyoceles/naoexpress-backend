@@ -11,6 +11,9 @@ import { UserRole } from '../models/User';
 
 const router = Router();
 
+// Public route for guest complaints
+router.post('/public', createComplaint);
+
 router.use(protect);
 
 router.post('/', createComplaint);

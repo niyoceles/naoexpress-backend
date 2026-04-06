@@ -5,7 +5,7 @@ import Organization from '../models/Organization';
 import Shipment, { ShipmentStatus } from '../models/Shipment';
 import ShipmentEvent from '../models/ShipmentEvent';
 import Warehouse from '../models/Warehouse';
-import InventoryItem from '../models/InventoryItem';
+import Complaint from '../models/Complaint';
 
 dotenv.config();
 
@@ -28,7 +28,6 @@ export const seedDatabase = async (isForce = false) => {
         await Shipment.deleteMany({});
         await ShipmentEvent.deleteMany({});
         await Warehouse.deleteMany({});
-        await InventoryItem.deleteMany({});
 
         console.log('Old data cleared.');
 
@@ -108,9 +107,10 @@ export const seedDatabase = async (isForce = false) => {
                 country: 'Kenya'
             },
             parcels: [{
+                name: 'Essential Office Supplies',
                 weight: 2.5,
                 dimensions: { length: 20, width: 15, height: 10 },
-                description: 'Office Supplies',
+                description: 'Stationery, notebooks, and corporate branding materials.',
                 declaredValue: 150
             }],
             status: ShipmentStatus.IN_TRANSIT,
@@ -158,7 +158,7 @@ export const seedDatabase = async (isForce = false) => {
 
         console.log('Sample free shipment created with DISPATCHED status.');
 
-        // Seed some warehouses
+        // Seed some warehouses (Logistics Hubs)
         const warehouses = await Warehouse.create([
             {
                 name: 'Kigali Hub',
@@ -178,29 +178,61 @@ export const seedDatabase = async (isForce = false) => {
 
         console.log('Warehouses seeded.');
 
-        // Seed Inventory
-        await InventoryItem.create([
-            {
-                sku: 'EL-MBP-14',
-                name: 'MacBook Pro 14 M3',
-                description: 'Apple silicon high-performance laptop',
-                quantity: 45,
-                warehouseId: warehouses[0]._id,
-                binLocation: 'KGL-A-12',
-                status: 'in_stock'
-            },
-            {
-                sku: 'EL-IPH-15',
-                name: 'iPhone 15 Pro',
-                description: 'Titanium grey 256GB',
-                quantity: 8,
-                warehouseId: warehouses[1]._id,
-                binLocation: 'NBO-B-04',
-                status: 'low_stock'
-            }
-        ]);
+        // Seed Complaints (Resolution Center)
+        await Complaint.deleteMany({});
+        
+        const c1 = await Complaint.create({
+            subject: 'Delayed Pickup in Kigali',
+            description: 'My package was scheduled for pickup 3 hours ago and no one has arrived yet.',
+            status: 'open',
+            priority: 'urgent',
+            userId: customer._id,
+            shipmentId: shipment._id
+        });
 
-        console.log('Inventory items seeded.');
+        const c2 = await Complaint.create({
+            subject: 'Incorrect Weight Calculation',
+            description: 'I believe my package was weighed incorrectly. The dashboard says 2.5kg but it should be 1.2kg.',
+            status: 'in_progress',
+            priority: 'medium',
+            userId: customer._id,
+            shipmentId: shipment._id,
+            responses: [
+                {
+                    user: support._id,
+                    message: "High John, we've received your request. We'll re-verify the weight at the Kigali Hub under the CCTV camera and update you soon.",
+                    timestamp: new Date(Date.now() - 3600000)
+                }
+            ]
+        });
+
+        const c3 = await Complaint.create({
+            subject: 'Delivery Successfully Redirected',
+            description: 'I need to change my delivery address for Nairobi.',
+            status: 'resolved',
+            priority: 'low',
+            userId: customer._id,
+            shipmentId: shipment._id,
+            responses: [
+                {
+                    user: support._id,
+                    message: "Happy to help! Please provide the new coordinates.",
+                    timestamp: new Date(Date.now() - 7200000)
+                },
+                {
+                    user: customer._id,
+                    message: "It is now Flat 5, Westlands Heights instead of Flat 12.",
+                    timestamp: new Date(Date.now() - 7000000)
+                },
+                {
+                    user: support._id,
+                    message: "Update confirmed. The courier has been notified of the change to Flat 5.",
+                    timestamp: new Date(Date.now() - 6500000)
+                }
+            ]
+        });
+
+        console.log('Resolution Center complaints seeded.');
 
         // Update sample shipment with assignment
         await Shipment.findByIdAndUpdate(shipment._id, { assignedTo: warehouseOp._id });

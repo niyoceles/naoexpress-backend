@@ -1,14 +1,28 @@
 import { Request, Response } from 'express';
 import Complaint, { ComplaintStatus } from '../models/Complaint';
+import Shipment from '../models/Shipment';
+import { notifyNewComplaint } from '../services/emailService';
 
 export const createComplaint = async (req: any, res: Response) => {
     try {
-        const { subject, description, shipmentId, priority, guestEmail, guestPhone } = req.body;
+        const { subject, description, shipmentId, trackingNumber, priority, guestEmail, guestPhone } = req.body;
         
+        let finalShipmentId = shipmentId;
+
+        // If trackingNumber is provided but no shipmentId, look it up
+        if (!finalShipmentId && trackingNumber) {
+            const shipment = await Shipment.findOne({ trackingNumber });
+            if (shipment) {
+                finalShipmentId = shipment._id;
+            } else {
+                return res.status(404).json({ success: false, message: 'Shipment with this tracking number not found.' });
+            }
+        }
+
         const complaintData: any = {
             subject,
             description,
-            shipmentId: shipmentId || null,
+            shipmentId: finalShipmentId || null,
             priority: priority || 'medium'
         };
 
@@ -23,6 +37,9 @@ export const createComplaint = async (req: any, res: Response) => {
         }
 
         const complaint = await Complaint.create(complaintData);
+
+        // Send email notification
+        await notifyNewComplaint(complaint);
 
         res.status(201).json({ success: true, data: complaint });
     } catch (error: any) {

@@ -11,6 +11,7 @@ import courierRoutes from './routes/courierRoutes';
 import warehouseOpsRoutes from './routes/warehouseOpsRoutes';
 import supportRoutes from './routes/supportRoutes';
 import complaintRoutes from './routes/complaintRoutes';
+import contactRoutes from './routes/contactRoutes';
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use('/api/courier', courierRoutes);
 app.use('/api/warehouse-ops', warehouseOpsRoutes);
 app.use('/api/support', supportRoutes);
 app.use('/api/complaints', complaintRoutes);
+app.use('/api/contacts', contactRoutes);
 
 // Centralized Error Handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

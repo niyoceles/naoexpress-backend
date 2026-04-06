@@ -6,6 +6,7 @@ import Shipment, { ShipmentStatus } from '../models/Shipment';
 import ShipmentEvent from '../models/ShipmentEvent';
 import Warehouse from '../models/Warehouse';
 import Complaint from '../models/Complaint';
+import Contact from '../models/Contact';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ export const seedDatabase = async (isForce = false) => {
         await Shipment.deleteMany({});
         await ShipmentEvent.deleteMany({});
         await Warehouse.deleteMany({});
+        await Contact.deleteMany({});
 
         console.log('Old data cleared.');
 
@@ -232,7 +234,43 @@ export const seedDatabase = async (isForce = false) => {
             ]
         });
 
+        const c4 = await Complaint.create({
+            subject: 'Guest Inquiry: Package not found',
+            description: 'I sent a package yesterday but it does not show up in the tracking system yet. Please help!',
+            status: 'open',
+            priority: 'medium',
+            guestEmail: 'guest_user@hotmail.com',
+            guestPhone: '+254-711-222-333',
+            shipmentId: shipment._id // Link to sample shipment anyway
+        });
+
         console.log('Resolution Center complaints seeded.');
+
+        // Seed Contact Us Inquiries
+        await Contact.create([
+            {
+                email: 'hello@partner.com',
+                phone: '+1-555-0199',
+                subject: 'Partnership Opportunity',
+                message: 'We are interested in integrating with your API for our e-commerce platform.',
+                status: 'new'
+            },
+            {
+                email: 'support_request@user.com',
+                phone: '+250-700-111-222',
+                subject: 'Lost Package Inquiry',
+                message: 'I would like to know about the bulk shipping rates for regular routes from China to Rwanda.',
+                status: 'read'
+            },
+            {
+                email: 'john.smith@gmail.com',
+                phone: '+44-20-7946-0958',
+                subject: 'Career Inquiry',
+                message: 'Are you currently hiring software engineers for your logistics optimization team?',
+                status: 'replied'
+            }
+        ]);
+        console.log('General Contact Us inquiries seeded.');
 
         // Update sample shipment with assignment
         await Shipment.findByIdAndUpdate(shipment._id, { assignedTo: warehouseOp._id });

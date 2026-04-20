@@ -23,15 +23,18 @@ export const seedDatabase = async (isForce = false) => {
 
         console.log('Starting database seeding...');
 
-        // Clear existing data only if forced or if DB was already empty (safety)
-        await User.deleteMany({});
-        await Organization.deleteMany({});
-        await Shipment.deleteMany({});
-        await ShipmentEvent.deleteMany({});
-        await Warehouse.deleteMany({});
-        await Contact.deleteMany({});
-
-        console.log('Old data cleared.');
+        // Delete existing data ONLY if forced
+        if (isForce) {
+            await User.deleteMany({});
+            await Organization.deleteMany({});
+            await Shipment.deleteMany({});
+            await ShipmentEvent.deleteMany({});
+            await Warehouse.deleteMany({});
+            await Contact.deleteMany({});
+            console.log('Old data cleared (FORCED).');
+        } else {
+            console.log('Safe seeding: Skipping data clearance.');
+        }
 
         // Create Admin Organization
         const org = await Organization.create({
@@ -181,7 +184,9 @@ export const seedDatabase = async (isForce = false) => {
         console.log('Warehouses seeded.');
 
         // Seed Complaints (Resolution Center)
-        await Complaint.deleteMany({});
+        if (isForce) {
+            await Complaint.deleteMany({});
+        }
         
         const c1 = await Complaint.create({
             subject: 'Delayed Pickup in Kigali',

@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
-    "start": "npm run seed:prod && node dist/index.js",
+    "start": "node dist/index.js",
     "seed": "ts-node src/utils/seed.ts",
     "seed:prod": "node dist/utils/seed.js"
   },

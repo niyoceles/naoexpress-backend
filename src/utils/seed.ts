@@ -189,6 +189,7 @@ export const seedDatabase = async (isForce = false) => {
             status: 'open',
             priority: 'urgent',
             userId: customer._id,
+            trackingNumber: shipment.trackingNumber,
             shipmentId: shipment._id
         });
 
@@ -198,6 +199,7 @@ export const seedDatabase = async (isForce = false) => {
             status: 'in_progress',
             priority: 'medium',
             userId: customer._id,
+            trackingNumber: shipment.trackingNumber,
             shipmentId: shipment._id,
             responses: [
                 {
@@ -214,6 +216,7 @@ export const seedDatabase = async (isForce = false) => {
             status: 'resolved',
             priority: 'low',
             userId: customer._id,
+            trackingNumber: shipment.trackingNumber,
             shipmentId: shipment._id,
             responses: [
                 {
@@ -241,6 +244,7 @@ export const seedDatabase = async (isForce = false) => {
             priority: 'medium',
             guestEmail: 'guest_user@hotmail.com',
             guestPhone: '+254-711-222-333',
+            trackingNumber: shipment.trackingNumber,
             shipmentId: shipment._id // Link to sample shipment anyway
         });
 

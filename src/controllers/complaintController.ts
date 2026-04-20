@@ -22,6 +22,7 @@ export const createComplaint = async (req: any, res: Response) => {
         const complaintData: any = {
             subject,
             description,
+            trackingNumber,
             shipmentId: finalShipmentId || null,
             priority: priority || 'medium'
         };
@@ -49,7 +50,9 @@ export const createComplaint = async (req: any, res: Response) => {
 
 export const getMyComplaints = async (req: any, res: Response) => {
     try {
-        const complaints = await Complaint.find({ userId: req.user._id }).sort({ createdAt: -1 });
+        const complaints = await Complaint.find({ userId: req.user._id })
+            .populate('shipmentId', 'trackingNumber')
+            .sort({ createdAt: -1 });
         res.status(200).json({ success: true, data: complaints });
     } catch (error: any) {
         res.status(500).json({ success: false, message: error.message });

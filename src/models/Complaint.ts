@@ -22,6 +22,7 @@ export interface IComplaint extends Document {
     userId?: mongoose.Types.ObjectId;
     guestEmail?: string;
     guestPhone?: string;
+    trackingNumber?: string;
     shipmentId?: mongoose.Types.ObjectId;
     assignedTo?: mongoose.Types.ObjectId;
     responses: Array<{
@@ -39,6 +40,7 @@ const ComplaintSchema: Schema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'User' },
     guestEmail: { type: String },
     guestPhone: { type: String },
+    trackingNumber: { type: String },
     shipmentId: { type: Schema.Types.ObjectId, ref: 'Shipment' },
     assignedTo: { type: Schema.Types.ObjectId, ref: 'User' },
     responses: [{

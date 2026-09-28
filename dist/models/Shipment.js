@@ -73,6 +73,7 @@ const ShipmentSchema = new mongoose_1.Schema({
         country: { type: String, required: true }
     },
     parcels: [{
+            name: { type: String, required: true },
             weight: { type: Number, required: true },
             dimensions: {
                 length: { type: Number, required: true },

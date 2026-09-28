@@ -54,7 +54,10 @@ const ComplaintSchema = new mongoose_1.Schema({
     description: { type: String, required: true },
     status: { type: String, enum: Object.values(ComplaintStatus), default: ComplaintStatus.OPEN },
     priority: { type: String, enum: Object.values(ComplaintPriority), default: ComplaintPriority.MEDIUM },
-    userId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
+    userId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User' },
+    guestEmail: { type: String },
+    guestPhone: { type: String },
+    trackingNumber: { type: String },
     shipmentId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Shipment' },
     assignedTo: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User' },
     responses: [{

@@ -44,7 +44,8 @@ const Organization_1 = __importDefault(require("../models/Organization"));
 const Shipment_1 = __importStar(require("../models/Shipment"));
 const ShipmentEvent_1 = __importDefault(require("../models/ShipmentEvent"));
 const Warehouse_1 = __importDefault(require("../models/Warehouse"));
-const InventoryItem_1 = __importDefault(require("../models/InventoryItem"));
+const Complaint_1 = __importDefault(require("../models/Complaint"));
+const Contact_1 = __importDefault(require("../models/Contact"));
 dotenv_1.default.config();
 const seedDatabase = async (isForce = false) => {
     try {
@@ -57,14 +58,19 @@ const seedDatabase = async (isForce = false) => {
             }
         }
         console.log('Starting database seeding...');
-        // Clear existing data only if forced or if DB was already empty (safety)
-        await User_1.default.deleteMany({});
-        await Organization_1.default.deleteMany({});
-        await Shipment_1.default.deleteMany({});
-        await ShipmentEvent_1.default.deleteMany({});
-        await Warehouse_1.default.deleteMany({});
-        await InventoryItem_1.default.deleteMany({});
-        console.log('Old data cleared.');
+        // Delete existing data ONLY if forced
+        if (isForce) {
+            await User_1.default.deleteMany({});
+            await Organization_1.default.deleteMany({});
+            await Shipment_1.default.deleteMany({});
+            await ShipmentEvent_1.default.deleteMany({});
+            await Warehouse_1.default.deleteMany({});
+            await Contact_1.default.deleteMany({});
+            console.log('Old data cleared (FORCED).');
+        }
+        else {
+            console.log('Safe seeding: Skipping data clearance.');
+        }
         // Create Admin Organization
         const org = await Organization_1.default.create({
             name: 'NAO Express Global',
@@ -134,9 +140,10 @@ const seedDatabase = async (isForce = false) => {
                 country: 'Kenya'
             },
             parcels: [{
+                    name: 'Essential Office Supplies',
                     weight: 2.5,
                     dimensions: { length: 20, width: 15, height: 10 },
-                    description: 'Office Supplies',
+                    description: 'Stationery, notebooks, and corporate branding materials.',
                     declaredValue: 150
                 }],
             status: Shipment_1.ShipmentStatus.IN_TRANSIT,
@@ -181,7 +188,7 @@ const seedDatabase = async (isForce = false) => {
             }
         ]);
         console.log('Sample free shipment created with DISPATCHED status.');
-        // Seed some warehouses
+        // Seed some warehouses (Logistics Hubs)
         const warehouses = await Warehouse_1.default.create([
             {
                 name: 'Kigali Hub',
@@ -199,28 +206,97 @@ const seedDatabase = async (isForce = false) => {
             }
         ]);
         console.log('Warehouses seeded.');
-        // Seed Inventory
-        await InventoryItem_1.default.create([
+        // Seed Complaints (Resolution Center)
+        if (isForce) {
+            await Complaint_1.default.deleteMany({});
+        }
+        const c1 = await Complaint_1.default.create({
+            subject: 'Delayed Pickup in Kigali',
+            description: 'My package was scheduled for pickup 3 hours ago and no one has arrived yet.',
+            status: 'open',
+            priority: 'urgent',
+            userId: customer._id,
+            trackingNumber: shipment.trackingNumber,
+            shipmentId: shipment._id
+        });
+        const c2 = await Complaint_1.default.create({
+            subject: 'Incorrect Weight Calculation',
+            description: 'I believe my package was weighed incorrectly. The dashboard says 2.5kg but it should be 1.2kg.',
+            status: 'in_progress',
+            priority: 'medium',
+            userId: customer._id,
+            trackingNumber: shipment.trackingNumber,
+            shipmentId: shipment._id,
+            responses: [
+                {
+                    user: support._id,
+                    message: "High John, we've received your request. We'll re-verify the weight at the Kigali Hub under the CCTV camera and update you soon.",
+                    timestamp: new Date(Date.now() - 3600000)
+                }
+            ]
+        });
+        const c3 = await Complaint_1.default.create({
+            subject: 'Delivery Successfully Redirected',
+            description: 'I need to change my delivery address for Nairobi.',
+            status: 'resolved',
+            priority: 'low',
+            userId: customer._id,
+            trackingNumber: shipment.trackingNumber,
+            shipmentId: shipment._id,
+            responses: [
+                {
+                    user: support._id,
+                    message: "Happy to help! Please provide the new coordinates.",
+                    timestamp: new Date(Date.now() - 7200000)
+                },
+                {
+                    user: customer._id,
+                    message: "It is now Flat 5, Westlands Heights instead of Flat 12.",
+                    timestamp: new Date(Date.now() - 7000000)
+                },
+                {
+                    user: support._id,
+                    message: "Update confirmed. The courier has been notified of the change to Flat 5.",
+                    timestamp: new Date(Date.now() - 6500000)
+                }
+            ]
+        });
+        const c4 = await Complaint_1.default.create({
+            subject: 'Guest Inquiry: Package not found',
+            description: 'I sent a package yesterday but it does not show up in the tracking system yet. Please help!',
+            status: 'open',
+            priority: 'medium',
+            guestEmail: 'guest_user@hotmail.com',
+            guestPhone: '+254-711-222-333',
+            trackingNumber: shipment.trackingNumber,
+            shipmentId: shipment._id // Link to sample shipment anyway
+        });
+        console.log('Resolution Center complaints seeded.');
+        // Seed Contact Us Inquiries
+        await Contact_1.default.create([
             {
-                sku: 'EL-MBP-14',
-                name: 'MacBook Pro 14 M3',
-                description: 'Apple silicon high-performance laptop',
-                quantity: 45,
-                warehouseId: warehouses[0]._id,
-                binLocation: 'KGL-A-12',
-                status: 'in_stock'
+                email: 'hello@partner.com',
+                phone: '+1-555-0199',
+                subject: 'Partnership Opportunity',
+                message: 'We are interested in integrating with your API for our e-commerce platform.',
+                status: 'new'
             },
             {
-                sku: 'EL-IPH-15',
-                name: 'iPhone 15 Pro',
-                description: 'Titanium grey 256GB',
-                quantity: 8,
-                warehouseId: warehouses[1]._id,
-                binLocation: 'NBO-B-04',
-                status: 'low_stock'
+                email: 'support_request@user.com',
+                phone: '+250-700-111-222',
+                subject: 'Lost Package Inquiry',
+                message: 'I would like to know about the bulk shipping rates for regular routes from China to Rwanda.',
+                status: 'read'
+            },
+            {
+                email: 'john.smith@gmail.com',
+                phone: '+44-20-7946-0958',
+                subject: 'Career Inquiry',
+                message: 'Are you currently hiring software engineers for your logistics optimization team?',
+                status: 'replied'
             }
         ]);
-        console.log('Inventory items seeded.');
+        console.log('General Contact Us inquiries seeded.');
         // Update sample shipment with assignment
         await Shipment_1.default.findByIdAndUpdate(shipment._id, { assignedTo: warehouseOp._id });
         console.log('Sample shipment assigned to warehouse operator.');

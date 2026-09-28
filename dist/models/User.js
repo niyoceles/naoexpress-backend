@@ -53,7 +53,7 @@ const UserSchema = new mongoose_1.Schema({
     password: { type: String, required: true, select: false },
     role: { type: String, enum: Object.values(UserRole), default: UserRole.CUSTOMER },
     orgId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Organization' },
-    phone: { type: String },
+    phone: { type: String, trim: true },
     avatar: { type: String },
     isActive: { type: Boolean, default: true },
     lastLogin: { type: Date },

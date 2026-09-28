@@ -32,19 +32,48 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.respondToComplaint = exports.updateComplaintStatus = exports.getAllComplaints = exports.getMyComplaints = exports.createComplaint = void 0;
 const Complaint_1 = __importStar(require("../models/Complaint"));
+const Shipment_1 = __importDefault(require("../models/Shipment"));
+const emailService_1 = require("../services/emailService");
 const createComplaint = async (req, res) => {
     try {
-        const { subject, description, shipmentId, priority } = req.body;
-        const complaint = await Complaint_1.default.create({
+        const { subject, description, shipmentId, trackingNumber, priority, guestEmail, guestPhone } = req.body;
+        let finalShipmentId = shipmentId;
+        // If trackingNumber is provided but no shipmentId, look it up
+        if (!finalShipmentId && trackingNumber) {
+            const shipment = await Shipment_1.default.findOne({ trackingNumber });
+            if (shipment) {
+                finalShipmentId = shipment._id;
+            }
+            else {
+                return res.status(404).json({ success: false, message: 'Shipment with this tracking number not found.' });
+            }
+        }
+        const complaintData = {
             subject,
             description,
-            shipmentId: shipmentId || null,
-            priority: priority || 'medium',
-            userId: req.user._id
-        });
+            trackingNumber,
+            shipmentId: finalShipmentId || null,
+            priority: priority || 'medium'
+        };
+        if (req.user) {
+            complaintData.userId = req.user._id;
+        }
+        else {
+            if (!guestEmail) {
+                return res.status(400).json({ success: false, message: 'Email is required for guest complaints.' });
+            }
+            complaintData.guestEmail = guestEmail;
+            complaintData.guestPhone = guestPhone;
+        }
+        const complaint = await Complaint_1.default.create(complaintData);
+        // Send email notification
+        await (0, emailService_1.notifyNewComplaint)(complaint);
         res.status(201).json({ success: true, data: complaint });
     }
     catch (error) {
@@ -54,7 +83,9 @@ const createComplaint = async (req, res) => {
 exports.createComplaint = createComplaint;
 const getMyComplaints = async (req, res) => {
     try {
-        const complaints = await Complaint_1.default.find({ userId: req.user._id }).sort({ createdAt: -1 });
+        const complaints = await Complaint_1.default.find({ userId: req.user._id })
+            .populate('shipmentId', 'trackingNumber')
+            .sort({ createdAt: -1 });
         res.status(200).json({ success: true, data: complaints });
     }
     catch (error) {

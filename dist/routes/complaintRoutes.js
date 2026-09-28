@@ -5,6 +5,8 @@ const complaintController_1 = require("../controllers/complaintController");
 const auth_1 = require("../middlewares/auth");
 const User_1 = require("../models/User");
 const router = (0, express_1.Router)();
+// Public route for guest complaints
+router.post('/public', complaintController_1.createComplaint);
 router.use(auth_1.protect);
 router.post('/', complaintController_1.createComplaint);
 router.get('/my', complaintController_1.getMyComplaints);

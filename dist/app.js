@@ -16,7 +16,7 @@ const courierRoutes_1 = __importDefault(require("./routes/courierRoutes"));
 const warehouseOpsRoutes_1 = __importDefault(require("./routes/warehouseOpsRoutes"));
 const supportRoutes_1 = __importDefault(require("./routes/supportRoutes"));
 const complaintRoutes_1 = __importDefault(require("./routes/complaintRoutes"));
-const inventoryRoutes_1 = __importDefault(require("./routes/inventoryRoutes"));
+const contactRoutes_1 = __importDefault(require("./routes/contactRoutes"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 // Middleware
@@ -38,7 +38,7 @@ app.use('/api/courier', courierRoutes_1.default);
 app.use('/api/warehouse-ops', warehouseOpsRoutes_1.default);
 app.use('/api/support', supportRoutes_1.default);
 app.use('/api/complaints', complaintRoutes_1.default);
-app.use('/api/inventory', inventoryRoutes_1.default);
+app.use('/api/contacts', contactRoutes_1.default);
 // Centralized Error Handler
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;

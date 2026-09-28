@@ -11,5 +11,7 @@ const router = express_1.default.Router();
 router.use(auth_1.protect, (0, auth_1.authorize)(User_1.UserRole.WAREHOUSE_OP, User_1.UserRole.ADMIN));
 router.get('/skus', inventoryController_1.getSKUs);
 router.post('/stock-in', inventoryController_1.stockIn);
+router.post('/create', inventoryController_1.createProduct);
+router.post('/dispatch', inventoryController_1.dispatchInventory);
 router.patch('/:id/quantity', inventoryController_1.updateStockLevel);
 exports.default = router;
